@@ -1,0 +1,21 @@
+.reg-threesixty img{
+  position: relative;
+  width: 100%;
+}
+
+.reg-threesixty img{
+  width: 100%;
+  height: auto;
+  /*visibility:hidden;*/
+  opacity: 0;
+  /*display: none;*/
+  position: absolute;
+}
+
+.reg-threesixty img.current{
+
+  height: auto;
+  /*visibility:visible;*/
+  opacity: 1;
+  /*display: block;*/
+}
