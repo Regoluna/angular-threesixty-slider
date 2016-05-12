@@ -15,7 +15,8 @@ angular.module('reg.threeSixty', [])
       scope:{
         images: '='
       },
-      link: function postLink(scope, element, attrs) {
+      link: function(scope, element, attrs) {
+
         var img;
         var currentFrame = 0;
         var endFrame;
@@ -31,19 +32,31 @@ angular.module('reg.threeSixty', [])
         var monitorInt = 0;
         var speedMultiplier = -48;
 
+        var initImages = function(){
+          // Init images
+          for( var i = 0 ; i < scope.images.length ; i++ ){
+            img = new Image();
+            element.append( img );
+            frames.push(img);
+            img.src = scope.images[ i ];
+          }
 
-        // Init images
-        for( var i = 0 ; i < scope.images.length ; i++ ){
-          img = new Image();
-          element.append( img );
-          frames.push(img);
-          img.src = scope.images[ i ];
-        }
+          totalFrames = scope.images.length;
 
-        totalFrames = scope.images.length;
+          // Activate first image
+          if( frames.length > 0 ){
+            frames[0].className = 'current';
+          }
+        };
 
-        // Activate first image
-        frames[0].className = 'current';
+        initImages();
+
+        // Update images on model change
+        scope.$watchCollection('images', function(){
+          console.log('actualizando modelo', attrs);
+          console.log( scope.images );
+          initImages();
+        });
 
         //
         var refresh = function () {

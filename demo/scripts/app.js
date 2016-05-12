@@ -10,12 +10,15 @@
  */
 angular
   .module('threesixtyDemo', ['reg.threeSixty'])
-    .controller('MainCtrl', [ '$scope', function ($scope) {
+    .controller('MainCtrl', [ '$scope', '$timeout', function ($scope,$timeout) {
 
       $scope.imageList = [];
 
-      for( var i=1; i<47; i++ ){
-        $scope.imageList.push( 'images/' + i + '.jpg' );
-      }
+      $timeout( function(){
+        for( var i=1; i<47; i++ ){
+          $scope.imageList.push( 'images/' + i + '.jpg' );
+        }
+      }, 200 );
+
 
     }]);
