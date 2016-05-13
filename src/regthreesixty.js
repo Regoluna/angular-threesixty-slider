@@ -22,6 +22,7 @@ angular.module('reg.threeSixty', [])
         var endFrame;
         var ticker = 0;
         var totalFrames;
+        var loadedImages;
         var frames = [];
         var ready = false;
         var dragging;
@@ -32,33 +33,73 @@ angular.module('reg.threeSixty', [])
         var monitorInt = 0;
         var speedMultiplier = -48;
 
-        var initImages = function(){
-          // Init images
-          for( var i = 0 ; i < scope.images.length ; i++ ){
+        var adjustHeight = function(){
+          if( loadedImages > 0 ){
+            var elementW = element[0].offsetWidth;
+            var imageW = frames[0].width;
+            var h = frames[0].height * ( elementW / imageW );
+            console.log( frames[0].height , element[0].offsetWidth, h );
+            element.css( 'height' , h + 'px' );
+          }
+        };
+
+
+
+        var load360Images = function(){
+
+          for( var i = 1 ; i < scope.images.length ; i++ ){
             img = new Image();
+            img.onload = imageReady;
             element.append( img );
             frames.push(img);
             img.src = scope.images[ i ];
           }
 
-          totalFrames = scope.images.length;
+        };
 
-          // Activate first image
-          if( frames.length > 0 ){
-            frames[0].className = 'current';
+        var imageReady = function( event ){
+          loadedImages ++;
+          if( loadedImages === totalFrames ){
+            ready = true;
           }
+        };
+
+        var firstImageReady = function(){
+          // Remove previous images.
+          element.find('img').remove();
+          loadedImages ++;
+          var firstImage = frames[0];
+          firstImage.className = 'current';
+          adjustHeight();
+          element.append( firstImage );
+          element.removeClass('loading-first');
+          load360Images();
+        };
+
+        var initImages = function(){
+
+          element.addClass('loading-first');
+
+          frames = [];
+          totalFrames = scope.images.length;
+          loadedImages = 0;
+
+          if( totalFrames > 0 ){
+            // Load first image
+            img = new Image();
+            img.onload = firstImageReady;
+            img.src = scope.images[ 0 ];
+            frames.push(img);
+          }
+
         };
 
         initImages();
 
         // Update images on model change
-        scope.$watchCollection('images', function(){
-          console.log('actualizando modelo', attrs);
-          console.log( scope.images );
-          initImages();
-        });
+        scope.$watchCollection('images', initImages );
 
-        //
+
         var refresh = function () {
           if (ticker === 0) {
             ticker = setInterval(render, Math.round(1000 / 10));
@@ -67,7 +108,9 @@ angular.module('reg.threeSixty', [])
 
         var getNormalizedCurrentFrame = function() {
           var c = -Math.ceil(currentFrame % totalFrames);
-          if (c < 0) c += (totalFrames - 1);
+          if (c < 0) {
+            c += (totalFrames - 1);
+          }
           return c;
         };
 
@@ -96,7 +139,6 @@ angular.module('reg.threeSixty', [])
         };
 
         // start
-        ready = true;
         endFrame = -totalFrames ;
         refresh();
 
@@ -121,10 +163,9 @@ angular.module('reg.threeSixty', [])
           if (ready && dragging) {
 
             pointerEndPosX = getPointerEvent(event).pageX;
-            // console.log(pointerEndPosX);
+
             if(monitorStartTime < new Date().getTime() - monitorInt) {
               pointerDistance = pointerEndPosX - pointerStartPosX;
-                console.log(pointerDistance);
               endFrame = currentFrame + Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / 600 ));
               refresh();
               monitorStartTime = new Date().getTime();
@@ -136,6 +177,8 @@ angular.module('reg.threeSixty', [])
         function mouseup(event){
           event.preventDefault();
           dragging = false;
+          $document.off('touchmove mousemove', mousemove);
+          $document.off('touchend mouseup', mouseup);
         }
 
         function mousemove(event){
@@ -143,7 +186,10 @@ angular.module('reg.threeSixty', [])
           trackPointer(event);
         }
 
-
+        scope.$on( '$destroy', function() {
+          $document.off('touchmove mousemove', mousemove);
+          $document.off('touchend mouseup', mouseup);
+        });
 
       }
     };

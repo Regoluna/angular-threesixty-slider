@@ -1,21 +1,21 @@
-.reg-threesixty img{
+.reg-threesixty{
+  opacity: 1;
+  transition: opacity 0.5s ease;
   position: relative;
-  width: 100%;
+  overflow: hidden;
+}
+
+.reg-threesixty.loading-first{
+  opacity: 0;
 }
 
 .reg-threesixty img{
   width: 100%;
   height: auto;
-  /*visibility:hidden;*/
-  opacity: 0;
-  /*display: none;*/
+  display: none;
   position: absolute;
 }
 
 .reg-threesixty img.current{
-
-  height: auto;
-  /*visibility:visible;*/
-  opacity: 1;
-  /*display: block;*/
+  display: block;
 }
