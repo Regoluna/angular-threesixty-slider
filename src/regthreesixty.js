@@ -7,7 +7,7 @@
  * # regThreesixty
  */
 angular.module('reg.threeSixty', [])
-  .directive('threesixty', ['$document',function ($document) {
+  .directive('threesixty', ['$document', '$window',function ($document, $window) {
     return {
       template: '<div class="reg-threesixty"></div>',
       restrict: 'E',
@@ -38,12 +38,11 @@ angular.module('reg.threeSixty', [])
             var elementW = element[0].offsetWidth;
             var imageW = frames[0].width;
             var h = frames[0].height * ( elementW / imageW );
-            console.log( frames[0].height , element[0].offsetWidth, h );
             element.css( 'height' , h + 'px' );
           }
         };
 
-
+        angular.element($window).on('resize', adjustHeight );
 
         var load360Images = function(){
 
@@ -189,6 +188,7 @@ angular.module('reg.threeSixty', [])
         scope.$on( '$destroy', function() {
           $document.off('touchmove mousemove', mousemove);
           $document.off('touchend mouseup', mouseup);
+          angular.element($window).off('resize', adjustHeight );
         });
 
       }
