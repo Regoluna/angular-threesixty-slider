@@ -33,6 +33,10 @@ angular.module('reg.threeSixty', [])
         var monitorInt = 0;
         var speedMultiplier = -48;
 
+        var count = 0;
+
+        count ++ ;
+
         var adjustHeight = function(){
           if( loadedImages > 0 ){
             var elementW = element[0].offsetWidth;
@@ -50,7 +54,7 @@ angular.module('reg.threeSixty', [])
             img = new Image();
             img.onload = imageReady;
             element.append( img );
-            frames.push(img);
+            frames[i] = img;
             img.src = scope.images[ i ];
           }
 
@@ -132,7 +136,7 @@ angular.module('reg.threeSixty', [])
             currentFrame += frameEasing;
             showCurrentFrame();
           } else {
-            window.clearInterval(ticker);
+            $window.clearInterval(ticker);
             ticker = 0;
           }
         };
