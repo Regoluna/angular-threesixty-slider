@@ -33,10 +33,6 @@ angular.module('reg.threeSixty', [])
         var monitorInt = 0;
         var speedMultiplier = -48;
 
-        var count = 0;
-
-        count ++ ;
-
         var adjustHeight = function(){
           if( loadedImages > 0 ){
             var elementW = element[0].offsetWidth;
