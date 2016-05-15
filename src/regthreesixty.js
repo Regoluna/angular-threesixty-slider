@@ -100,7 +100,21 @@ angular.module('reg.threeSixty', [])
         initImages();
 
         // Update images on model change
-        scope.$watchCollection('images', initImages );
+        // only if image list changes
+        scope.$watchCollection('images', function( newImageList, oldImageList){
+
+          if( newImageList.length != oldImageList.length ){
+            initImages();
+          }else{
+            for (var i = 0; i < oldImageList.length; i++) {
+              if( newImageList[ i ] !== oldImageList[ i ] ){
+                initImages();
+                break;
+              }
+            }
+          }
+
+        } );
 
 
         var refresh = function () {
