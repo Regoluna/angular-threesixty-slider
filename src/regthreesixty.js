@@ -31,7 +31,7 @@ angular.module('reg.threeSixty', [])
         var pointerDistance;
         var monitorStartTime = 0;
         var monitorInt = 0;
-        var speedMultiplier = -48;
+        var speedMultiplier = 20;
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -60,6 +60,9 @@ angular.module('reg.threeSixty', [])
           loadedImages ++;
           if( loadedImages === totalFrames ){
             ready = true;
+            // start
+            endFrame = totalFrames;
+            refresh();
           }
         };
 
@@ -115,7 +118,7 @@ angular.module('reg.threeSixty', [])
 
         var refresh = function () {
           if (ticker === 0) {
-            ticker = setInterval(render, Math.round(1000 / 10));
+            ticker = setInterval(render, Math.round(1000 / 30));
           }
         };
 
@@ -137,8 +140,7 @@ angular.module('reg.threeSixty', [])
 
 
         var render = function() {
-          if(currentFrame !== endFrame)
-          {
+          if( frames.length >0 && currentFrame !== endFrame){
             var frameEasing = endFrame < currentFrame ?
               Math.floor((endFrame - currentFrame) * 0.1) :
               Math.ceil((endFrame - currentFrame) * 0.1);
@@ -150,10 +152,6 @@ angular.module('reg.threeSixty', [])
             ticker = 0;
           }
         };
-
-        // start
-        endFrame = -totalFrames ;
-        refresh();
 
         // Touch and Click events
 

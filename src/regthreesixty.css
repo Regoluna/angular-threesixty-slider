@@ -12,10 +12,11 @@
 .reg-threesixty img{
   width: 100%;
   height: auto;
-  display: none;
+  display: block;
+  visibility: hidden;
   position: absolute;
 }
 
 .reg-threesixty img.current{
-  display: block;
+  visibility: visible;
 }
