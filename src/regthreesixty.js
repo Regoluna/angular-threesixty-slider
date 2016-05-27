@@ -6,7 +6,7 @@
  * @description
  * # regThreesixty
  */
-angular.module('reg.threeSixty', [])
+angular.module('reg.threesixty', [])
   .directive('threesixty', ['$document', '$window',function ($document, $window) {
     return {
       template: '<div class="reg-threesixty"></div>',
