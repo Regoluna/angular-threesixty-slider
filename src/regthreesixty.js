@@ -13,7 +13,8 @@ angular.module('reg.threesixty', [])
       restrict: 'E',
       replace:true,
       scope:{
-        images: '='
+        images: '=',
+        reverse: '='
       },
       link: function(scope, element, attrs) {
 
@@ -175,9 +176,11 @@ angular.module('reg.threesixty', [])
 
             pointerEndPosX = getPointerEvent(event).pageX;
 
+            var direction = scope.reverse? -1 : 1 ;
+
             if(monitorStartTime < new Date().getTime() - monitorInt) {
               pointerDistance = pointerEndPosX - pointerStartPosX;
-              endFrame = currentFrame + Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / 600 ));
+              endFrame = currentFrame + Math.ceil((totalFrames - 1) * direction * speedMultiplier * (pointerDistance / 600 ));
               refresh();
               monitorStartTime = new Date().getTime();
               pointerStartPosX = getPointerEvent(event).pageX;
