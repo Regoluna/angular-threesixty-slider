@@ -23,7 +23,7 @@ Angular JS.
 3. include the files in your app
 	1. `src/regthreesixty.js`
 	2. `src/regthreesixty.css`
-4. include the module in angular (i.e. in `app.js`) - `reg.threeSixty`
+4. include the module in angular (i.e. in `app.js`) - `reg.threesixty`
 
 
 ## Basic usage
