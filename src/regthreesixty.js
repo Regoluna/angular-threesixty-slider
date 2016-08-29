@@ -176,7 +176,7 @@ angular.module('reg.threesixty', [])
 
           $document.on('touchmove mousemove', mousemove);
           $document.on('touchend mouseup', mouseup);
-        };
+        }
 
         function trackPointer(event){
           if (ready && dragging) {

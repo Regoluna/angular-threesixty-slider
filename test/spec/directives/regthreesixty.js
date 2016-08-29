@@ -3,7 +3,7 @@
 describe('Directive: regThreesixty', function () {
 
   // load the directive's module
-  beforeEach(module('threesixtyDemo'));
+  beforeEach(module('reg.threesixty'));
 
   var element,
     scope;
@@ -12,9 +12,9 @@ describe('Directive: regThreesixty', function () {
     scope = $rootScope.$new();
   }));
 
-  it('should make hidden element visible', inject(function ($compile) {
+  it('should define the directive', inject(function ($compile) {
     element = angular.element('<reg-threesixty></reg-threesixty>');
     element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the regThreesixty directive');
+    expect(element).toBeDefined();
   }));
 });
