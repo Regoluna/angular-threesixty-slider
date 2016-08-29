@@ -183,11 +183,20 @@ angular.module('reg.threesixty', [])
 
             pointerEndPosX = getPointerEvent(event).pageX;
 
-            var direction = scope.reverse? -1 : 1 ;
-
             if(monitorStartTime < new Date().getTime() - monitorInt) {
+              var frameDiff = 0,
+                direction = scope.reverse? -1 : 1 ;
+
               pointerDistance = pointerEndPosX - pointerStartPosX;
-              endFrame = currentFrame + Math.ceil((totalFrames - 1) * direction * speedMultiplier * (pointerDistance / 600 ));
+
+              if(pointerDistance > 0){
+                frameDiff = Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+              }else{
+                frameDiff = Math.floor((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+              }
+
+              endFrame = currentFrame + (direction * frameDiff);
+
               refresh();
               monitorStartTime = new Date().getTime();
               pointerStartPosX = getPointerEvent(event).pageX;
