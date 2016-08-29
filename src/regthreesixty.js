@@ -14,7 +14,9 @@ angular.module('reg.threesixty', [])
       replace:true,
       scope:{
         images: '=',
-        reverse: '='
+        reverse: '=',
+        animateAfterLoading: '=',
+        speedMultiplier: '='
       },
       link: function(scope, element, attrs) {
 
@@ -32,7 +34,8 @@ angular.module('reg.threesixty', [])
         var pointerDistance;
         var monitorStartTime = 0;
         var monitorInt = 0;
-        var speedMultiplier = 20;
+        var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
+        var animateAfterLoading = scope.animateAfterLoading ? scope.animateAfterLoading : true;
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -63,7 +66,10 @@ angular.module('reg.threesixty', [])
             ready = true;
             // start
             endFrame = totalFrames;
-            refresh();
+
+            if (animateAfterLoading) {
+              refresh();
+            }
           }
         };
 
@@ -117,9 +123,10 @@ angular.module('reg.threesixty', [])
         } );
 
 
-        var refresh = function () {
+        var refresh = function (animationSpeed) {
+
           if (ticker === 0) {
-            ticker = setInterval(render, Math.round(1000 / 30));
+            ticker = setInterval(render, animationSpeed || Math.round(1000 / 30));
           }
         };
 
@@ -143,8 +150,8 @@ angular.module('reg.threesixty', [])
         var render = function() {
           if( frames.length >0 && currentFrame !== endFrame){
             var frameEasing = endFrame < currentFrame ?
-              Math.floor((endFrame - currentFrame) * 0.1) :
-              Math.ceil((endFrame - currentFrame) * 0.1);
+                Math.floor((endFrame - currentFrame) * 0.1) :
+                Math.ceil((endFrame - currentFrame) * 0.1);
             hidePreviousFrame();
             currentFrame += frameEasing;
             showCurrentFrame();
@@ -157,7 +164,7 @@ angular.module('reg.threesixty', [])
         // Touch and Click events
 
         var getPointerEvent = function(event) {
-            return event.targetTouches ? event.targetTouches[0] : event;
+          return event.targetTouches ? event.targetTouches[0] : event;
         };
 
         element.on('touchstart mousedown', mousedown);
@@ -199,6 +206,12 @@ angular.module('reg.threesixty', [])
           event.preventDefault();
           trackPointer(event);
         }
+
+        scope.$on('threesixty-animate', function(event, animationSpeed) {
+          ticker = 0;
+          endFrame = currentFrame + totalFrames;
+          refresh(animationSpeed);
+        });
 
         scope.$on( '$destroy', function() {
           $document.off('touchmove mousemove', mousemove);
