@@ -35,7 +35,6 @@ angular.module('reg.threesixty', [])
         var monitorStartTime = 0;
         var monitorInt = 0;
         var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
-        var animateAfterLoading = scope.animateAfterLoading ? scope.animateAfterLoading : true;
         var ROTATION_EVENT = 'threesixty-animate';
 
         var adjustHeight = function(){
@@ -68,7 +67,7 @@ angular.module('reg.threesixty', [])
             // start
             endFrame = totalFrames;
 
-            if (animateAfterLoading) {
+            if (scope.animateAfterLoading) {
               refresh();
             }
           }
