@@ -7,23 +7,27 @@ Currently only supports basic operations:
 * Once the first image is loaded it loads the rest of the list asynchronously. When done, spins 360 degress and activates mouse and touch interaction.
 
 ## TODO
-* Set more configuration parameters using attributes: Direction, Speed, ...
 * Give more feedback about loading status and weh its ready to spin.
 
 ## Dependencies
 Angular JS.
 
 ## Install
-1. download the files or use Bower:
+1. Install the npm dependencies:
+  
+  `npm install`
+  
+2. download the files or use Bower:
 
 	add `"angular-threesixty-slider": "latest"` to your `bower.json` file then run `bower install` OR run
 
 	`bower install angular-threesixty-slider --save`
 
-3. include the files in your app
+4. include the files in your app
 	1. `src/regthreesixty.js`
 	2. `src/regthreesixty.css`
-4. include the module in angular (i.e. in `app.js`) - `reg.threesixty`
+
+5. include the module in angular (i.e. in `app.js`) - `reg.threesixty`
 
 
 ## Basic usage
@@ -38,5 +42,7 @@ Angular JS.
 ```
 2. Include **threesixty** directive in HTML. Set image list using `images` attribute.
 ```html
-<threesixty images="imageList" >
+<threesixty images="imageList" animate-after-loading="true" speed-multiplier="20">
 ```
+
+3. Trigger a rotation by emitting the event `threesixty-animate` to the directive scope

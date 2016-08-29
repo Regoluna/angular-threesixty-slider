@@ -36,6 +36,7 @@ angular.module('reg.threesixty', [])
         var monitorInt = 0;
         var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
         var animateAfterLoading = scope.animateAfterLoading ? scope.animateAfterLoading : true;
+        var ROTATION_EVENT = 'threesixty-animate';
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -216,7 +217,7 @@ angular.module('reg.threesixty', [])
           trackPointer(event);
         }
 
-        scope.$on('threesixty-animate', function(event, animationSpeed) {
+        scope.$on(ROTATION_EVENT, function(event, animationSpeed) {
           ticker = 0;
           endFrame = currentFrame + totalFrames;
           refresh(animationSpeed);
