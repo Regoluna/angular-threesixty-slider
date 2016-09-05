@@ -20,5 +20,8 @@ angular
         $scope.imageList.push( 'images/' + i + '.jpg' );
       }
 
+      $scope.animateThreeSixty = function() {
+        $scope.$broadcast('threesixty-animate', 60);
+      };
 
     }]);

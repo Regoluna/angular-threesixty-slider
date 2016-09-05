@@ -14,7 +14,9 @@ angular.module('reg.threesixty', [])
       replace:true,
       scope:{
         images: '=',
-        reverse: '='
+        reverse: '=',
+        animateAfterLoading: '=',
+        speedMultiplier: '='
       },
       link: function(scope, element, attrs) {
 
@@ -32,7 +34,8 @@ angular.module('reg.threesixty', [])
         var pointerDistance;
         var monitorStartTime = 0;
         var monitorInt = 0;
-        var speedMultiplier = 20;
+        var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
+        var ROTATION_EVENT = 'threesixty-animate';
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -63,7 +66,10 @@ angular.module('reg.threesixty', [])
             ready = true;
             // start
             endFrame = totalFrames;
-            refresh();
+
+            if (scope.animateAfterLoading) {
+              refresh();
+            }
           }
         };
 
@@ -117,9 +123,10 @@ angular.module('reg.threesixty', [])
         } );
 
 
-        var refresh = function () {
+        var refresh = function (animationSpeed) {
+
           if (ticker === 0) {
-            ticker = setInterval(render, Math.round(1000 / 30));
+            ticker = setInterval(render, animationSpeed || Math.round(1000 / 30));
           }
         };
 
@@ -143,8 +150,8 @@ angular.module('reg.threesixty', [])
         var render = function() {
           if( frames.length >0 && currentFrame !== endFrame){
             var frameEasing = endFrame < currentFrame ?
-              Math.floor((endFrame - currentFrame) * 0.1) :
-              Math.ceil((endFrame - currentFrame) * 0.1);
+                Math.floor((endFrame - currentFrame) * 0.1) :
+                Math.ceil((endFrame - currentFrame) * 0.1);
             hidePreviousFrame();
             currentFrame += frameEasing;
             showCurrentFrame();
@@ -157,7 +164,7 @@ angular.module('reg.threesixty', [])
         // Touch and Click events
 
         var getPointerEvent = function(event) {
-            return event.targetTouches ? event.targetTouches[0] : event;
+          return event.targetTouches ? event.targetTouches[0] : event;
         };
 
         element.on('touchstart mousedown', mousedown);
@@ -169,18 +176,27 @@ angular.module('reg.threesixty', [])
 
           $document.on('touchmove mousemove', mousemove);
           $document.on('touchend mouseup', mouseup);
-        };
+        }
 
         function trackPointer(event){
           if (ready && dragging) {
 
             pointerEndPosX = getPointerEvent(event).pageX;
 
-            var direction = scope.reverse? -1 : 1 ;
-
             if(monitorStartTime < new Date().getTime() - monitorInt) {
+              var frameDiff = 0,
+                direction = scope.reverse? -1 : 1 ;
+
               pointerDistance = pointerEndPosX - pointerStartPosX;
-              endFrame = currentFrame + Math.ceil((totalFrames - 1) * direction * speedMultiplier * (pointerDistance / 600 ));
+
+              if(pointerDistance > 0){
+                frameDiff = Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+              }else{
+                frameDiff = Math.floor((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+              }
+
+              endFrame = currentFrame + (direction * frameDiff);
+
               refresh();
               monitorStartTime = new Date().getTime();
               pointerStartPosX = getPointerEvent(event).pageX;
@@ -199,6 +215,12 @@ angular.module('reg.threesixty', [])
           event.preventDefault();
           trackPointer(event);
         }
+
+        scope.$on(ROTATION_EVENT, function(event, animationSpeed) {
+          ticker = 0;
+          endFrame = currentFrame + totalFrames;
+          refresh(animationSpeed);
+        });
 
         scope.$on( '$destroy', function() {
           $document.off('touchmove mousemove', mousemove);
