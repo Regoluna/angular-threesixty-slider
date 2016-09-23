@@ -217,7 +217,6 @@ angular.module('reg.threesixty', [])
         }
 
         scope.$on(ROTATION_EVENT, function(event, animationSpeed) {
-          ticker = 0;
           endFrame = currentFrame + totalFrames;
           refresh(animationSpeed);
         });
