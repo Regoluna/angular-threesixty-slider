@@ -21,6 +21,8 @@ angular.module('reg.threesixty', [])
       link: function(scope, element, attrs) {
 
         var img;
+        var imgList = scope.images;
+        var slicedFrames = 0;
         var currentFrame = 0;
         var endFrame;
         var ticker = 0;
@@ -50,12 +52,12 @@ angular.module('reg.threesixty', [])
 
         var load360Images = function(){
 
-          for( var i = 1 ; i < scope.images.length ; i++ ){
+          for( var i = 1 ; i < imgList.length ; i++ ){
             img = new Image();
             img.onload = imageReady;
             element.append( img );
             frames[i] = img;
-            img.src = scope.images[ i ];
+            img.src = imgList[ i ];
           }
 
         };
@@ -90,14 +92,14 @@ angular.module('reg.threesixty', [])
           element.addClass('loading-first');
 
           frames = [];
-          totalFrames = scope.images.length;
+          totalFrames = imgList.length;
           loadedImages = 0;
 
           if( totalFrames > 0 ){
             // Load first image
             img = new Image();
             img.onload = firstImageReady;
-            img.src = scope.images[ 0 ];
+            img.src = imgList[ 0 ];
             frames.push(img);
           }
 
@@ -109,6 +111,16 @@ angular.module('reg.threesixty', [])
         // only if image list changes
         scope.$watchCollection('images', function( newImageList, oldImageList){
 
+          slicedFrames += Math.abs(getNormalizedCurrentFrame());
+          if (slicedFrames >= newImageList.length - 1) {
+            slicedFrames -= newImageList.length;
+          }
+
+          var firstPart = newImageList.slice(0, slicedFrames);
+          var lastPart = newImageList.slice(slicedFrames);
+
+          imgList = lastPart.concat(firstPart);
+          currentFrame = 0;
           if( newImageList.length != oldImageList.length ){
             initImages();
           }else{
@@ -150,8 +162,8 @@ angular.module('reg.threesixty', [])
         var render = function() {
           if( frames.length >0 && currentFrame !== endFrame){
             var frameEasing = endFrame < currentFrame ?
-                Math.floor((endFrame - currentFrame) * 0.1) :
-                Math.ceil((endFrame - currentFrame) * 0.1);
+              Math.floor((endFrame - currentFrame) * 0.1) :
+              Math.ceil((endFrame - currentFrame) * 0.1);
             hidePreviousFrame();
             currentFrame += frameEasing;
             showCurrentFrame();
