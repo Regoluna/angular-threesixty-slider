@@ -4,19 +4,19 @@ An angular directive to create  360 degree slider.
 
 Currently only supports basic operations:
 * At the start it loads and visualizes the first image.
-* Once the first image is loaded it loads the rest of the list asynchronously. When done, spins 360 degress and activates mouse and touch interaction.
+* Once the first image is loaded, it loads the rest of the list asynchronously. When done, spins 360 degrees and activates mouse and touch interaction.
 
 ## TODO
-* Give more feedback about loading status and weh its ready to spin.
+* Give more feedback about loading status and when it's ready to spin.
 
 ## Dependencies
 Angular JS.
 
 ## Install
 1. Install the npm dependencies:
-  
+
   `npm install`
-  
+
 2. download the files or use Bower:
 
 	add `"angular-threesixty-slider": "latest"` to your `bower.json` file then run `bower install` OR run

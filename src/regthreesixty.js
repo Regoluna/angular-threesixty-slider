@@ -164,7 +164,7 @@ angular.module('reg.threesixty', [])
         // Touch and Click events
 
         var getPointerEvent = function(event) {
-          return event.targetTouches ? event.targetTouches[0] : event;
+          return event.originalEvent.targetTouches ? event.originalEvent.targetTouches[0] : event;
         };
 
         element.on('touchstart mousedown', mousedown);
