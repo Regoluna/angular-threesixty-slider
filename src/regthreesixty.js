@@ -49,14 +49,17 @@ angular.module('reg.threesixty', [])
         var scrollY = 0;
         var scrolling = false;
         var scrollTimer;
+
         /**
          * required movement on the X axis to start swiping
          */
         var requiredMovementXinit = scope.requiredMovementXinit ? parseInt(scope.requiredMovementXinit) : 6;
+
         /**
          * required movement on the X axis to consider it a swipe (after initial swipe)
          */
         var requiredMovementXcont = scope.requiredMovementXcont ? parseInt(scope.requiredMovementXcont) : 2;
+
         /**
          * how much bigger movement on the X axis has to be than movement on the Y axis
          */
