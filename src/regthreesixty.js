@@ -16,7 +16,10 @@ angular.module('reg.threesixty', [])
         images: '=',
         reverse: '=',
         animateAfterLoading: '=',
-        speedMultiplier: '='
+        speedMultiplier: '=',
+        requiredMovementXinit: '=',
+        requiredMovementXcont: '=',
+        triggerMultiplier: '='
       },
       link: function(scope, element, attrs) {
 
@@ -40,12 +43,24 @@ angular.module('reg.threesixty', [])
         var monitorInt = 0;
         var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
         var ROTATION_EVENT = 'threesixty-animate';
-        var body = $document[0].body;
+        var body = document.body;
         var bodyClasses = body.classList;
         var initialDrag = true;
         var scrollY = 0;
         var scrolling = false;
         var scrollTimer;
+        /**
+         * required movement on the X axis to start swiping
+         */
+        var requiredMovementXinit = scope.requiredMovementXinit ? parseInt(scope.requiredMovementXinit) : 6;
+        /**
+         * required movement on the X axis to consider it a swipe (after initial swipe)
+         */
+        var requiredMovementXcont = scope.requiredMovementXcont ? parseInt(scope.requiredMovementXcont) : 2;
+        /**
+         * how much bigger movement on the X axis has to be than movement on the Y axis
+         */
+        var triggerMultiplier = scope.triggerMultiplier ? parseInt(scope.triggerMultiplier) : 3;
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -58,15 +73,24 @@ angular.module('reg.threesixty', [])
 
         angular.element($window).on('resize', adjustHeight );
 
+        /**
+         * set scrolling variable to false when scrolling ended
+         */
         var scrollEnd = function() {
           scrolling = false;
         };
 
-        var updateOffset = function(event) {
+        /**
+         * update scrolling position that is used to lock scrolling while swiping
+         */
+        var updateOffset = function() {
             if (!dragging || initialDrag) {
                 scrollY = $window.scrollY;
                 scrolling = true;
-                scrollTimer && $timeout.cancel(scrollTimer);
+
+                if(scrollTimer) {
+                  $timeout.cancel(scrollTimer);
+                }
                 scrollTimer = $timeout(scrollEnd, 300);
             }
         };
@@ -229,8 +253,9 @@ angular.module('reg.threesixty', [])
               var xDistanceAbs = Math.abs(pointerDistance);
               var pointerDistanceY = Math.abs(pointerEndPosY - pointerStartPosY);
 
-              if (((!initialDrag && xDistanceAbs > 1) || (initialDrag && xDistanceAbs > 5)) &&
-                  (pointerDistanceY * 3) < xDistanceAbs) {
+              if (((!initialDrag && xDistanceAbs >= requiredMovementXcont) ||
+                      (initialDrag && xDistanceAbs >= requiredMovementXinit)) &&
+                  (pointerDistanceY * triggerMultiplier) < xDistanceAbs) {
 
                   if (initialDrag) {
                     initialDrag = false;
@@ -238,10 +263,12 @@ angular.module('reg.threesixty', [])
                     bodyClasses.add('no-scroll');
                   }
 
+                  var rawDiff = (totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth);
+
                   if (pointerDistance > 0){
-                      frameDiff = Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+                      frameDiff = Math.ceil(rawDiff);
                   } else {
-                      frameDiff = Math.floor((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+                      frameDiff = Math.floor(rawDiff);
                   }
 
                   endFrame = currentFrame + (direction * frameDiff);
