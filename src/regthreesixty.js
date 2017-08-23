@@ -7,7 +7,7 @@
  * # regThreesixty
  */
 angular.module('reg.threesixty', [])
-  .directive('threesixty', ['$document', '$window',function ($document, $window) {
+  .directive('threesixty', ['$document', '$window', '$timeout',function ($document, $window, $timeout) {
     return {
       template: '<div class="reg-threesixty"></div>',
       restrict: 'E',
@@ -16,7 +16,10 @@ angular.module('reg.threesixty', [])
         images: '=',
         reverse: '=',
         animateAfterLoading: '=',
-        speedMultiplier: '='
+        speedMultiplier: '=',
+        requiredMovementXinit: '=',
+        requiredMovementXcont: '=',
+        triggerMultiplier: '='
       },
       link: function(scope, element, attrs) {
 
@@ -33,11 +36,34 @@ angular.module('reg.threesixty', [])
         var dragging;
         var pointerEndPosX;
         var pointerStartPosX;
+        var pointerEndPosY;
+        var pointerStartPosY;
         var pointerDistance;
         var monitorStartTime = 0;
         var monitorInt = 0;
         var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
         var ROTATION_EVENT = 'threesixty-animate';
+        var body = document.body;
+        var bodyClasses = body.classList;
+        var initialDrag = true;
+        var scrollY = 0;
+        var scrolling = false;
+        var scrollTimer;
+
+        /**
+         * required movement on the X axis to start swiping
+         */
+        var requiredMovementXinit = scope.requiredMovementXinit ? parseInt(scope.requiredMovementXinit) : 6;
+
+        /**
+         * required movement on the X axis to consider it a swipe (after initial swipe)
+         */
+        var requiredMovementXcont = scope.requiredMovementXcont ? parseInt(scope.requiredMovementXcont) : 2;
+
+        /**
+         * how much bigger movement on the X axis has to be than movement on the Y axis
+         */
+        var triggerMultiplier = scope.triggerMultiplier ? parseInt(scope.triggerMultiplier) : 3;
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -49,6 +75,30 @@ angular.module('reg.threesixty', [])
         };
 
         angular.element($window).on('resize', adjustHeight );
+
+        /**
+         * set scrolling variable to false when scrolling ended
+         */
+        var scrollEnd = function() {
+          scrolling = false;
+        };
+
+        /**
+         * update scrolling position that is used to lock scrolling while swiping
+         */
+        var updateOffset = function() {
+            if (!dragging || initialDrag) {
+                scrollY = $window.scrollY;
+                scrolling = true;
+
+                if(scrollTimer) {
+                  $timeout.cancel(scrollTimer);
+                }
+                scrollTimer = $timeout(scrollEnd, 300);
+            }
+        };
+
+        $document.on('touchmove scroll', updateOffset);
 
         var load360Images = function(){
 
@@ -182,49 +232,78 @@ angular.module('reg.threesixty', [])
         element.on('touchstart mousedown', mousedown);
 
         function mousedown (event) {
-          event.preventDefault();
           pointerStartPosX = getPointerEvent(event).pageX;
+          pointerStartPosY = getPointerEvent(event).pageY;
           dragging = true;
 
-          $document.on('touchmove mousemove', mousemove);
-          $document.on('touchend mouseup', mouseup);
+          element.on('touchmove mousemove', mousemove);
+          element.on('touchend mouseup', mouseup);
         }
 
         function trackPointer(event){
-          if (ready && dragging) {
+          if (ready && dragging && !scrolling) {
 
-            pointerEndPosX = getPointerEvent(event).pageX;
+            var pointerEvent = getPointerEvent(event);
+
+            pointerEndPosX = pointerEvent.pageX;
+            pointerEndPosY = pointerEvent.pageY;
 
             if(monitorStartTime < new Date().getTime() - monitorInt) {
               var frameDiff = 0,
                 direction = scope.reverse? -1 : 1 ;
 
               pointerDistance = pointerEndPosX - pointerStartPosX;
+              var xDistanceAbs = Math.abs(pointerDistance);
+              var pointerDistanceY = Math.abs(pointerEndPosY - pointerStartPosY);
 
-              if(pointerDistance > 0){
-                frameDiff = Math.ceil((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
-              }else{
-                frameDiff = Math.floor((totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth));
+              if (((!initialDrag && xDistanceAbs >= requiredMovementXcont) ||
+                      (initialDrag && xDistanceAbs >= requiredMovementXinit)) &&
+                  (pointerDistanceY * triggerMultiplier) < xDistanceAbs) {
+
+                  if (initialDrag) {
+                    initialDrag = false;
+                    body.style.top = -Math.abs(scrollY) + 'px';
+                    bodyClasses.add('no-scroll');
+                  }
+
+                  var rawDiff = (totalFrames - 1) * speedMultiplier * (pointerDistance / element[0].clientWidth);
+
+                  if (pointerDistance > 0){
+                      frameDiff = Math.ceil(rawDiff);
+                  } else {
+                      frameDiff = Math.floor(rawDiff);
+                  }
+
+                  endFrame = currentFrame + (direction * frameDiff);
+
+                  refresh();
+              } else if (initialDrag && xDistanceAbs * 5 < pointerDistanceY) {
+                dragging = false;
               }
 
-              endFrame = currentFrame + (direction * frameDiff);
-
-              refresh();
               monitorStartTime = new Date().getTime();
-              pointerStartPosX = getPointerEvent(event).pageX;
+              pointerStartPosX = pointerEvent.pageX;
+              pointerStartPosY = pointerEvent.pageY;
             }
           }
         }
 
         function mouseup(event){
-          event.preventDefault();
+          element.off('touchmove mousemove', mousemove);
+          element.off('touchend mouseup', mouseup);
+
+          bodyClasses.remove('no-scroll');
+          if (!initialDrag) {
+            $window.scroll(0, Math.abs(parseInt(body.style.top)));
+            body.style.top = null;
+          }
+
           dragging = false;
-          $document.off('touchmove mousemove', mousemove);
-          $document.off('touchend mouseup', mouseup);
+          initialDrag = true;
         }
 
         function mousemove(event){
-          event.preventDefault();
+          event.stopPropagation();
           trackPointer(event);
         }
 
