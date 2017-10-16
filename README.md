@@ -42,7 +42,7 @@ Angular JS.
 ```
 2. Include **threesixty** directive in HTML. Set image list using `images` attribute.
 ```html
-<threesixty images="imageList" animate-after-loading="true" speed-multiplier="20">
+<threesixty images="imageList" animate-after-loading="true" speed-multiplier="20" loading-notice="true">
 ```
 
 3. Trigger a rotation by emitting the event `threesixty-animate` to the directive scope
