@@ -26,3 +26,11 @@
 .reg-threesixty img.current{
   visibility: visible;
 }
+
+.reg-threesixty-loading {
+  position: absolute;
+  z-index: 1;
+  background-color: blue;
+  color: white;
+  width: 100%;
+}

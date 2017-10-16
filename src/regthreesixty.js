@@ -9,14 +9,16 @@
 angular.module('reg.threesixty', [])
   .directive('threesixty', ['$document', '$window',function ($document, $window) {
     return {
-      template: '<div class="reg-threesixty"></div>',
+      template: '<div class="reg-threesixty"><div class="reg-threesixty-loading"></div></div>',
       restrict: 'E',
       replace:true,
       scope:{
         images: '=',
         reverse: '=',
         animateAfterLoading: '=',
-        speedMultiplier: '='
+        speedMultiplier: '=',
+        loadingMessage: '=',
+        loadingNotice: '='
       },
       link: function(scope, element, attrs) {
 
@@ -38,6 +40,7 @@ angular.module('reg.threesixty', [])
         var monitorInt = 0;
         var speedMultiplier = scope.speedMultiplier ? parseInt(scope.speedMultiplier) : 20;
         var ROTATION_EVENT = 'threesixty-animate';
+        var loadingMessage = scope.loadingMessage ? scope.loadingMessage : 'Loading images...';
 
         var adjustHeight = function(){
           if( loadedImages > 0 ){
@@ -47,6 +50,13 @@ angular.module('reg.threesixty', [])
             element.css( 'height' , h + 'px' );
           }
         };
+
+        // setup loading notice
+        if (scope.loadingNotice) {
+          $('.reg-threesixty-loading').html(loadingMessage);
+        } else {
+          $('.reg-threesixty-loading').remove();
+        }
 
         angular.element($window).on('resize', adjustHeight );
 
@@ -71,6 +81,11 @@ angular.module('reg.threesixty', [])
 
             if (scope.animateAfterLoading) {
               refresh();
+            }
+
+            // remove loading notice
+            if (scope.loadingNotice) {
+              $('.reg-threesixty-loading').remove();
             }
           }
         };
