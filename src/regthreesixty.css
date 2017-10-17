@@ -26,3 +26,15 @@
 .reg-threesixty img.current{
   visibility: visible;
 }
+
+.reg-threesixty-controls {
+  position: absolute;
+  z-index: 1;
+  bottom: 0px;
+  height: 30px;
+  background-color: rgba(0,0,1,0.25);
+  color: white;
+  width: 100%;
+  font-size: x-large;
+  text-align: center;
+}
