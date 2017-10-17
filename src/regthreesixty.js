@@ -9,14 +9,15 @@
 angular.module('reg.threesixty', [])
   .directive('threesixty', ['$document', '$window',function ($document, $window) {
     return {
-      template: '<div class="reg-threesixty"></div>',
+      template: '<div class="reg-threesixty"><div class="reg-threesixty-controls"><span class="glyphicon glyphicon-chevron-left" ng-click="previousFrame()"></span>&nbsp;<span class="glyphicon glyphicon-repeat" ng-click="refresh()"></span>&nbsp;<span class="glyphicon glyphicon-chevron-right" ng-click="nextFrame()"></span></div></div>',
       restrict: 'E',
       replace:true,
       scope:{
         images: '=',
         reverse: '=',
         animateAfterLoading: '=',
-        speedMultiplier: '='
+        speedMultiplier: '=',
+        showControls: '='
       },
       link: function(scope, element, attrs) {
 
@@ -47,6 +48,11 @@ angular.module('reg.threesixty', [])
             element.css( 'height' , h + 'px' );
           }
         };
+
+        // show or hide controls
+        if (!scope.showControls) {
+          $('.reg-threesixty-controls').remove();
+        }
 
         angular.element($window).on('resize', adjustHeight );
 
@@ -140,6 +146,21 @@ angular.module('reg.threesixty', [])
           if (ticker === 0) {
             ticker = setInterval(render, animationSpeed || Math.round(1000 / 30));
           }
+        };
+
+        scope.refresh = function() {
+          endFrame = currentFrame + totalFrames;
+          refresh(100); 
+        };
+        scope.previousFrame = function() {
+          hidePreviousFrame();
+          currentFrame -= scope.reverse ? -1 : 1;
+          showCurrentFrame();
+        };
+        scope.nextFrame = function() {
+          hidePreviousFrame();
+          currentFrame += scope.reverse ? -1 : 1;
+          showCurrentFrame();
         };
 
         var getNormalizedCurrentFrame = function() {
